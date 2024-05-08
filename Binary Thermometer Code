@@ -1,0 +1,66 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+#define DATA_PIN 1 // Define ATTiny85 data pin connected to 74HC595 SER (pin 14)
+#define CLOCK_PIN 2 // Define ATTiny85 clock pin connected to 74HC595 SRCLK (pin 11)
+#define LATCH_PIN 0 // Define ATTiny85 latch pin connected to 74HC595 RCLK (pin 12)
+#define ONE_WIRE_BUS 4 // Define ATTiny85 pin connected to DS18B20 (PB4)
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+void setup() {
+  pinMode(DATA_PIN, OUTPUT);
+  pinMode(CLOCK_PIN, OUTPUT);
+  pinMode(LATCH_PIN, OUTPUT);
+
+// Start the DS18B20 sensor
+  sensors.begin();
+// Call the count function
+  countBinary();
+}
+// the loop routine runs over and over again forever:
+void loop() {
+
+// Turn off LEDs
+  shiftOut(DATA_PIN, CLOCK_PIN, MSBFIRST, 0); // Shift out 0 to turn off LEDs
+  digitalWrite(LATCH_PIN, HIGH); // Latch the data to 74HC595
+  digitalWrite(LATCH_PIN, LOW);
+
+//Delay for 2 seconds
+delay (2000);
+
+// Read temperature from DS18B20 sensor
+  sensors.requestTemperatures(); // Send the command to get temperature readings
+  float temperature = sensors.getTempCByIndex(0); // Read temperature in Celsius
+
+//Round the temperature
+  int tempforShift = roundf(temperature);
+
+//Shift the Value to the LEDs
+  shiftOut(DATA_PIN, CLOCK_PIN, MSBFIRST, tempforShift);
+// Latch the data to 74HC595
+ digitalWrite(LATCH_PIN, HIGH);
+ digitalWrite(LATCH_PIN, LOW);
+
+//Display temperature for 5 seconds
+delay (5000);
+
+  // Turn off LEDs
+  shiftOut(DATA_PIN, CLOCK_PIN, MSBFIRST, 0); // Shift out 0 to turn off LEDs
+  digitalWrite(LATCH_PIN, HIGH); // Latch the data to 74HC595
+  digitalWrite(LATCH_PIN, LOW);
+
+}
+//Binary Count Function (to test LEDs on Start-up)
+void countBinary() {
+  // Count from 0 to 31 (binary 00000 to 11111)
+  for (int i = 0; i < 64; i++) {
+    // Convert decimal number to binary and shift out to 74HC595
+    shiftOut(DATA_PIN, CLOCK_PIN, MSBFIRST, i);
+    // Latch the data to 74HC595
+    digitalWrite(LATCH_PIN, HIGH);
+    digitalWrite(LATCH_PIN, LOW);
+    delay(50); // Adjust this value for faster or slower counting
+  }
+ }
