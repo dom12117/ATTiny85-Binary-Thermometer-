@@ -19,16 +19,15 @@ void setup() {
 // Call the count function
   countBinary();
 }
-// the loop routine runs over and over again forever:
-void loop() {
 
+void loop() {
 // Turn off LEDs
   shiftOut(DATA_PIN, CLOCK_PIN, MSBFIRST, 0); // Shift out 0 to turn off LEDs
   digitalWrite(LATCH_PIN, HIGH); // Latch the data to 74HC595
   digitalWrite(LATCH_PIN, LOW);
 
-//Delay for 2 seconds
-delay (2000);
+//Delay for 60 seconds
+delay (60000);
 
 // Read temperature from DS18B20 sensor
   sensors.requestTemperatures(); // Send the command to get temperature readings
